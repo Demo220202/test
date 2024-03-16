@@ -1,0 +1,25 @@
+name: Create Git Tag on PR Approval
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  create_tag:
+    if: github.event.pull_request.merged == true && github.event.pull_request.merged_by != null
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+
+    - name: Create Git Tag
+      run: |
+        git tag -a "v${{ github.event.pull_request.number }}" -m "Version ${{ github.event.pull_request.number }} created from PR #${{ github.event.pull_request.number }}"
+        git push origin "v${{ github.event.pull_request.number }}"
