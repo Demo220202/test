@@ -23,9 +23,8 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git commit -m "Merge PR: ${{ github.event.pull_request.title }}"
           git tag "${{ github.event.pull_request.title }}"
-          git push --tags
+          git push origin "${{ github.event.pull_request.title }}"
           
       - name: Check if from Dev to Main
         if: ${{ github.event.pull_request.base.ref == 'main' && github.event.pull_request.head.ref == 'dev' }}
