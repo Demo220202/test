@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - dev
+      - qa
 
 jobs:
   process_pull_request:
