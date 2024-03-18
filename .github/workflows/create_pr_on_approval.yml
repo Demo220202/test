@@ -22,4 +22,4 @@ jobs:
     - name: Create Git Tag
       run: |
         git tag -a "${{ github.event.pull_request.title }}" -m "Version ${{ github.event.pull_request.number }} created from PR #${{ github.event.pull_request.number }}"
-        git push origin "Title : ${{ github.event.pull_request.title }}"
+        git push origin "${{ github.event.pull_request.title }}"
