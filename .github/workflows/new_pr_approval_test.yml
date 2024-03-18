@@ -5,7 +5,6 @@ on:
     branches:
       - main
       - dev
-      - qa
 
 jobs:
   process_pull_request:
@@ -13,7 +12,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          ref: main
       
+      - name: Fetch main branch
+        run: git fetch origin main
+
       - name: Check if from QA to Main
         if: ${{ github.event.pull_request.base.ref == 'main' && github.event.pull_request.head.ref == 'qa' }}
         run: |
