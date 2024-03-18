@@ -21,7 +21,7 @@ jobs:
       - name: Check if from QA to Main
         if: ${{ github.event.pull_request.base.ref == 'main' && github.event.pull_request.head.ref == 'qa' }}
         run: |
-          git merge --squash qa
+          git merge qa
           git commit -m "Merge PR: ${{ github.event.pull_request.title }}"
           git tag "${{ github.event.pull_request.title }}"
           git push --tags
