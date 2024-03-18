@@ -12,16 +12,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          ref: main
       
-      - name: Fetch main branch
-        run: git fetch origin main && git fetch origin qa
-
       - name: Check if from QA to Main
         if: ${{ github.event.pull_request.base.ref == 'main' && github.event.pull_request.head.ref == 'qa' }}
         run: |
-          git merge --squash origin/qa
+          git checkout main
+          git merge --squash qa
           git commit -m "Merge PR: ${{ github.event.pull_request.title }}"
           git tag "${{ github.event.pull_request.title }}"
           git push --tags
