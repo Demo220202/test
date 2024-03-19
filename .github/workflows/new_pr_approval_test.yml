@@ -31,7 +31,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push tags
-        uses: ad-m/github-push-action@main
+        uses: ad-m/github-push-action@master
         with:
           tags: |
             ${{ github.event.pull_request.title }}
