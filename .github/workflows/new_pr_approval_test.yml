@@ -23,10 +23,20 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+      
+      - name: Tag commit
+        run: |
           git tag "${{ github.event.pull_request.title }}" "${{ github.event.pull_request.head.sha }}"
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          git push origin "${{ github.event.pull_request.title }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push tags
+        uses: ad-m/github-push-action@main
+        with:
+          tags: |
+            ${{ github.event.pull_request.title }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
           
       - name: Check if from Dev to Main
