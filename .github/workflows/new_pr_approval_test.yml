@@ -23,8 +23,8 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+          git tag "${{ github.event.pull_request.title }}" "${{ github.event.pull_request.head.sha }}"
           git push origin "${{ github.event.pull_request.title }}"
-          git tag "${{ github.event.pull_request.title }}"
           
           
       - name: Check if from Dev to Main
