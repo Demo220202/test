@@ -1,11 +1,11 @@
 name: Pull Request Automation
-
+ 
 on:
   pull_request:
     branches:
       - main
       - dev
-
+ 
 jobs:
   process_pull_request:
     runs-on: ubuntu-latest
@@ -14,31 +14,17 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: main
-      
       - name: Fetch main branch
         run: git fetch origin main
-
+ 
       - name: Check if from QA to Main
         if: ${{ github.event.pull_request.base.ref == 'main' && github.event.pull_request.head.ref == 'qa' }}
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-      
-      - name: Tag commit
-        run: |
-          git tag "${{ github.event.pull_request.title }}" "${{ github.event.pull_request.head.sha }}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git push origin "${{ github.event.pull_request.title }}"
+          git tag "${{ github.event.pull_request.title }}"
 
-      - name: Push tags
-        uses: ad-m/github-push-action@master
-        with:
-          tags: |
-            ${{ github.event.pull_request.title }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-          
       - name: Check if from Dev to Main
         if: ${{ github.event.pull_request.base.ref == 'main' && github.event.pull_request.head.ref == 'dev' }}
         run: |
