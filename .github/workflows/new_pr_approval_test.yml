@@ -2,6 +2,7 @@ name: Pull Request Automation
  
 on:
   pull_request:
+    types: [closed]
     branches:
       - main
       - dev
