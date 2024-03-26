@@ -26,7 +26,7 @@ jobs:
           git tag "${{ github.event.pull_request.title }}"
           git push origin "${{ github.event.pull_request.title }}"
 
-      - name: Check if from Dev to Main
-        if: ${{ github.event.pull_request.base.ref == 'main' && github.event.pull_request.head.ref == 'dev' }}
+      - name: Check if from Dev to QA
+        if: ${{ github.event.pull_request.base.ref == 'qa' && github.event.pull_request.head.ref == 'dev' }}
         run: |
           echo "No action required for PR from Dev to Main"
