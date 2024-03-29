@@ -33,7 +33,10 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git tag -a "${{ github.event.pull_request.title }}" -m "${{ github.event.pull_request.body }}"
+          title = "${{ github.event.pull_request.title }}"
+          description = "${{ github.event.pull_request.body }}"
+          tag_message = "$title"$'\n'"$description"
+          git tag -a "$title" -m "$tag_message"
           git push origin "${{ github.event.pull_request.title }}"
 
       - name: Check if from Dev to QA
