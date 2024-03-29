@@ -34,8 +34,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           title = "${{ github.event.pull_request.title }}"
-          description = "${{ github.event.pull_request.body }}"
-          tag_message = "$title"$'\n'"$description"
+          tag_message = "${{ github.event.pull_request.body }}"
           git tag -a "$title" -m "$tag_message"
           git push origin "${{ github.event.pull_request.title }}"
 
