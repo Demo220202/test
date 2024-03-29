@@ -5,14 +5,13 @@ on:
     types: [closed]
     branches:
       - main
-      - dev
  
 jobs:
   process_pull_request:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: main
       - name: Fetch main branch
@@ -23,7 +22,15 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git tag "${{ github.event.pull_request.title }}"
+          git tag -a "${{ github.event.pull_request.title }}" -m "${{ github.event.pull_request.body }}"
+          git push origin "${{ github.event.pull_request.title }}"
+
+      - name: Check if from hotfix to Main
+        if: ${{ github.event.pull_request.base.ref == 'main' && github.event.pull_request.head.ref == 'hotfix' }}
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git tag -a "${{ github.event.pull_request.title }}" -m "${{ github.event.pull_request.body }}"
           git push origin "${{ github.event.pull_request.title }}"
 
       - name: Check if from Dev to QA
