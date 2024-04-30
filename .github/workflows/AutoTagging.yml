@@ -1,9 +1,6 @@
 name: Merge Branch
 on:
   workflow_dispatch:
-    types: [closed]
-    branch: main
-    
     inputs:
       from_branch:
         description: 'Source branch from '
