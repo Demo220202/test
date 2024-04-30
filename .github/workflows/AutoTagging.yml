@@ -1,1 +1,37 @@
+name: Merge Branch
+on:
+  workflow_dispatch:
+    inputs:
+      from_branch:
+        description: 'Source branch from '
+        required: true
+      to_branch:
+        description: 'Destination branch '
+        required: true
+      tag_name:
+        description: 'Name for the tag to be created'
+        required: true
 
+jobs:
+  merge_labels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Merge Branch
+        run: |
+          FROM_BRANCH=${{ github.event.inputs.from_branch }}
+          TO_BRANCH=${{ github.event.inputs.to_branch }}
+          git checkout $TO_BRANCH
+          git merge --no-ff --no-edit $FROM_BRANCH
+          git push origin $TO_BRANCH
+          
+      - name: Create Tag
+        run: |
+          TAG_NAME=${{ github.event.inputs.tag_name }}
+          COMMIT_ID=$(git rev-parse --short HEAD)
+          git tag $TAG_NAME-$COMMIT_ID
+          git push origin $TAG_NAME-$COMMIT_ID
+
+          
