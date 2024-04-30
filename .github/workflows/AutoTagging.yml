@@ -21,11 +21,13 @@ jobs:
 
       - name: Merge Branch
         run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
           FROM_BRANCH=${{ github.event.inputs.from_branch }}
           TO_BRANCH=${{ github.event.inputs.to_branch }}
-          git checkout $TO_BRANCH
-          git merge --no-ff --no-edit $FROM_BRANCH
-          git push origin $TO_BRANCH
+          git checkout ${TO_BRANCH}
+          git merge --no-ff --no-edit ${FROM_BRANCH}
+          git push origin ${TO_BRANCH}
           
       - name: Create Tag
         run: |
