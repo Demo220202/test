@@ -1,0 +1,46 @@
+name: Merge and Create Tag on PR
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  merge_labels_and_create_tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Git identity
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          
+      - name: Debug Information
+        run: |
+          echo "FROM_BRANCH: ${{ github.event.pull_request.head.ref }}"
+          echo "TO_BRANCH: ${{ github.event.pull_request.base.ref }}"
+          echo "TAG_NAME: ${{ github.event.pull_request.title }}"
+          git branch -a
+          git fetch --all
+          git branch -a
+          
+      - name: Merge
+        run: |
+          FROM_BRANCH=${{ github.event.pull_request.head.ref }}
+          TO_BRANCH=${{ github.event.pull_request.base.ref }}
+          git fetch origin $TO_BRANCH:$TO_BRANCH || { echo "Failed to fetch $TO_BRANCH"; exit 1; }
+          git fetch origin $FROM_BRANCH:$FROM_BRANCH || { echo "Failed to fetch $FROM_BRANCH"; exit 1; }
+          git checkout $TO_BRANCH || { echo "Failed to checkout $TO_BRANCH"; exit 1; }
+          git merge --no-ff --no-edit $FROM_BRANCH || { echo "Failed to merge $FROM_BRANCH into $TO_BRANCH"; exit 1; }
+          git push origin $TO_BRANCH || { echo "Failed to push changes to $TO_BRANCH"; exit 1; }
+          
+      - name: Create Tag
+        run: |
+          TAG_NAME=${{ github.event.pull_request.title }}
+          COMMIT_ID=$(git rev-parse --short HEAD)
+          git tag $TAG_NAME-$COMMIT_ID || { echo "Failed to create tag"; exit 1; }
+          git push origin $TAG_NAME-$COMMIT_ID || { echo "Failed to push tag"; exit 1; }
+          
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
