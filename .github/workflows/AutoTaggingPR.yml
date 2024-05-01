@@ -3,6 +3,8 @@ name: Merge and Create Tag on PR
 on:
   pull_request:
     types: [opened]
+    branches:
+      - main
 
 jobs:
   merge_labels_and_create_tag:
