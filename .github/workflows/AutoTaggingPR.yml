@@ -37,12 +37,12 @@ jobs:
           
       - name: Create Tag
         run: |
-          TAG_NAME="${{ github.event.pull_request.title }}"
           REPO_NAME=$(basename -s .git `git config --get remote.origin.url`)
-          TAG_MESSAGE="Repository: ${REPO_NAME}"
+          TAG_NAME="${{ github.event.pull_request.title }}"
           COMMIT_ID=$(git rev-parse --short HEAD)
-          git tag -a $TAG_NAME-$COMMIT_ID -m "$TAG_MESSAGE" || { echo "Failed to create tag"; exit 1; }
-          git push origin $TAG_NAME-$COMMIT_ID || { echo "Failed to push tag"; exit 1; }
+          TAG_MESSAGE="Repository: $REPO_NAME, Commit ID: $COMMIT_ID"
+          git tag -a $TAG_NAME -m "$TAG_MESSAGE" || { echo "Failed to create tag"; exit 1; }
+          git push origin $TAG_NAME || { echo "Failed to push tag"; exit 1; }
           
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
