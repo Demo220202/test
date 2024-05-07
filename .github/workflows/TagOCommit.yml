@@ -5,6 +5,9 @@ on:
       branch_name:
         description: 'Branch name'
         required: true
+      tag_name:
+        description: 'Tag name'
+        required: true
 
 jobs:
   create_tag_job:
