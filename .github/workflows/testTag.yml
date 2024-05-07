@@ -1,0 +1,41 @@
+# create_tag.yml
+
+name: Create Tag
+on:
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: 'Branch name'
+        required: true
+      tag_name:
+        description: 'Tag name'
+        required: true
+
+jobs:
+  create_tag_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Get latest commit ID of the specified branch
+        id: commit_id
+        run: |
+          git fetch origin ${{ inputs.branch_name }}
+          echo "::set-output name=commit_id::$(git rev-parse origin/${{ inputs.branch_name }})"
+      
+      - name: Show commit ID
+        run: echo "Latest commit ID of branch '${{ inputs.branch_name }}':${{ steps.commit_id.outputs.commit_id }}"
+      
+      - name: Create tag
+        id: create_tag
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ inputs.tag_name }}
+          release_name: Release ${{ github.sha }}
+          body: |
+            This is an automated release tag created from commit ${{ steps.commit_id.outputs.commit_id }}.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
