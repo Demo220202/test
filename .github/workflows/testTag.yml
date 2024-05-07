@@ -32,7 +32,8 @@ jobs:
         uses: actions/create-release@v1
         with:
           tag_name: ${{ inputs.tag_name }}
-          release_name: Release ${{ github.sha }}
+          commitish: ${{ steps.commit_id.outputs.commit_id }}
+          # release_name: Release ${{ github.sha }}
           body: |
             This is an automated release tag created from commit ${{ steps.commit_id.outputs.commit_id }}.
           draft: false
