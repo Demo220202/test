@@ -21,3 +21,9 @@ jobs:
       
       - name: Show commit ID
         run: echo "Latest commit ID of branch '${{ inputs.branch_name }}':${{ steps.commit_id.outputs.commit_id }}"
+
+      - name: Create tag
+        id: create_tag
+        run: |
+          git tag -a ${{ inputs.tag_name }} -m "Tagging commit ${{ steps.commit_id.outputs.commit_id }}"
+          git push origin ${{ inputs.tag_name }}
