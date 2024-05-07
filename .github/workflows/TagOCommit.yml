@@ -13,9 +13,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       
-      - name: Get latest commit ID
+      - name: Get latest commit ID of the specified branch
         id: commit_id
-        run: echo "::set-output name=commit_id::$(git rev-parse HEAD)"
-
+        run: |
+          git fetch origin ${{ inputs.branch_name }}
+          echo "::set-output name=commit_id::$(git rev-parse origin/${{ inputs.branch_name }})"
+      
       - name: Show commit ID
-        run: echo "Latest commit ID:${{ steps.commit_id.outputs.commit_id }}"
+        run: echo "Latest commit ID of branch '${{ inputs.branch_name }}':${{ steps.commit_id.outputs.commit_id }}"
