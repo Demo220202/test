@@ -1,32 +1,35 @@
-name: Tag and Checkout
+name: Tag on Commit ID
 
 on:
   workflow_dispatch:
     inputs:
       commit_id:
-        description: 'The commit ID to tag'
+        description: 'Commit ID'
         required: true
       tag_name:
-        description: 'The tag name to create'
+        description: 'Tag Name'
         required: true
 
 jobs:
-  create-tag:
+  tag_on_commit:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v3
-
-      - name: Create a new tag
+      - name: Tag on Commit
+        uses: actions/checkout@v4
+      - name: Set Git user name and email
         run: |
-          git tag ${{ github.event.inputs.tag_name }} ${{ github.event.inputs.commit_id }}
-          git push origin ${{ github.event.inputs.tag_name }}
+            git config --global user.name "${GITHUB_ACTOR}"
+            git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
-      - name: Checkout the new tag
-        run: |
-          git fetch --all
-          git checkout tags/${{ github.event.inputs.tag_name }}
+      - name: Create Tag
+        run: git tag -a ${{ github.event.inputs.tag_name }} ${{ github.event.inputs.commit_id }} -m "Tag on commit ID ${{ github.event.inputs.commit_id }} "
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - env:
+      - name: Push Tag
+        run: git push origin ${{ github.event.inputs.tag_name }}
+        shell: bash
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
