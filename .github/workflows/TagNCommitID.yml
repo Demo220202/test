@@ -1,0 +1,29 @@
+name: Tag and Checkout
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_id:
+        description: 'The commit ID to tag'
+        required: true
+      tag_name:
+        description: 'The tag name to create'
+        required: true
+
+jobs:
+  create-tag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Create a new tag
+        run: |
+          git tag ${{ github.event.inputs.tag_name }} ${{ github.event.inputs.commit_id }}
+          git push origin ${{ github.event.inputs.tag_name }}
+
+      - name: Checkout the new tag
+        run: |
+          git fetch --all
+          git checkout tags/${{ github.event.inputs.tag_name }}
