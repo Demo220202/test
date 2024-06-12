@@ -27,3 +27,6 @@ jobs:
         run: |
           git fetch --all
           git checkout tags/${{ github.event.inputs.tag_name }}
+
+      - env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
