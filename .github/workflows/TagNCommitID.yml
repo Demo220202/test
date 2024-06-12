@@ -15,21 +15,34 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Tag on Commit
-        uses: actions/checkout@v4
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history for all branches and tags
+
+      - name: Fetch all branches and tags
+        run: git fetch --all
+
       - name: Set Git user name and email
         run: |
-            git config --global user.name "${GITHUB_ACTOR}"
-            git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+      - name: Verify commit ID
+        id: verify_commit
+        run: |
+          git cat-file -t ${{ github.event.inputs.commit_id }}
 
       - name: Create Tag
-        run: git tag -a ${{ github.event.inputs.tag_name }} ${{ github.event.inputs.commit_id }} -m "Tag on commit ID ${{ github.event.inputs.commit_id }} "
-        shell: bash
+        if: steps.verify_commit.outputs.type == 'commit'
+        run: |
+          git tag -a ${{ github.event.inputs.tag_name }} ${{ github.event.inputs.commit_id }} -m "Tag on commit ID ${{ github.event.inputs.commit_id }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push Tag
-        run: git push origin ${{ github.event.inputs.tag_name }}
-        shell: bash
+        if: steps.verify_commit.outputs.type == 'commit'
+        run: |
+          git push origin ${{ github.event.inputs.tag_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
