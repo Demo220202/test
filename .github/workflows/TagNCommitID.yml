@@ -20,10 +20,17 @@ jobs:
         with:
           fetch-depth: 0  # Fetch all history for all branches and tags
 
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
       - name: Create a new tag
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           git tag ${{ github.event.inputs.tag_name }} ${{ github.event.inputs.commit_id }}
-          git push origin ${{ github.event.inputs.tag_name }}
+          git push https://github-actions:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git ${{ github.event.inputs.tag_name }}
 
       - name: Checkout the new tag
         run: |
