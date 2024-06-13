@@ -1,48 +1,48 @@
-name: Tag on Commit ID
-
+name: Create Tag
 on:
   workflow_dispatch:
     inputs:
-      commit_id:
-        description: 'Commit ID'
+      branch_name:
+        description: 'Branch name'
         required: true
       tag_name:
-        description: 'Tag Name'
+        description: 'Tag name'
         required: true
+      commit_id:
+        description: 'Commit ID'
+        required: false
 
 jobs:
-  tag_on_commit:
+  create_tag_job:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Get commit ID
+        if: ${{ !inputs.commit_id }}
+        id: commit_id
+        run: |
+          git fetch origin ${{ inputs.branch_name }}
+          echo "::set-output name=commit_id::$(git rev-parse origin/${{ inputs.branch_name }})"
+      
+      - name: Set commit ID
+        if: ${{ inputs.commit_id }}
+        run: echo "::set-output name=commit_id::${{ inputs.commit_id }}"
+      
+      - name: Show commit ID
+        run: echo "Commit ID: ${{ steps.commit_id.outputs.commit_id }}"
+      
+      - name: Create tag
+        id: create_tag
+        uses: actions/create-release@v1
         with:
-          fetch-depth: 0  # Fetch all history for all branches and tags
-
-      - name: Fetch all branches and tags
-        run: git fetch --all
-
-      - name: Set Git user name and email
-        run: |
-          git config --global user.name "${GITHUB_ACTOR}"
-          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-
-      - name: Verify commit ID
-        id: verify_commit
-        run: |
-          git cat-file -t ${{ github.event.inputs.commit_id }}
-
-      - name: Create Tag
-        if: steps.verify_commit.outputs.type == 'commit'
-        run: |
-          git tag -a ${{ github.event.inputs.tag_name }} ${{ github.event.inputs.commit_id }} -m "Tag on commit ID ${{ github.event.inputs.commit_id }}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Push Tag
-        if: steps.verify_commit.outputs.type == 'commit'
-        run: |
-          git push origin ${{ github.event.inputs.tag_name }}
+          tag_name: ${{ inputs.tag_name }}
+          commitish: ${{ steps.commit_id.outputs.commit_id }}
+          # release_name: Release ${{ github.sha }}
+          body: |
+            This is an automated release tag created from commit ${{ steps.commit_id.outputs.commit_id }}.
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
