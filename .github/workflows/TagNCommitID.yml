@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v2
       
       - name: Get commit ID
-        if: ${{ !inputs.commit_id }}
+        if: ${{ inputs.commit_id }}
         id: commit_id
         run: |
           git fetch origin ${{ inputs.branch_name }}
