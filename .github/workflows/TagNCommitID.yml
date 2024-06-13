@@ -31,7 +31,7 @@ jobs:
         run: echo "::set-output name=commit_id::${{ inputs.commit_id }}"
       
       - name: Show commit ID
-        run: echo "Commit ID: ${{ steps.commit_id.outputs.commit_id }}"
+        run: echo "Commit ID:${{ steps.commit_id.outputs.commit_id }}"
       
       - name: Create tag
         id: create_tag
