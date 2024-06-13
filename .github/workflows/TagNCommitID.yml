@@ -1,4 +1,4 @@
-name: Create Tag Old
+name: Tag Old Commit
 on:
   workflow_dispatch:
     inputs:
