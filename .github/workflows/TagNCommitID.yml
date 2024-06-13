@@ -1,4 +1,4 @@
-name: Tag Old Commit
+name: Create Tag
 on:
   workflow_dispatch:
     inputs:
@@ -19,29 +19,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       
-      - name: Get commit ID
-        if: ${{ inputs.commit_id }}
-        id: commit_id
+      - name: Get latest commit ID of the specified branch
+        if: ${{ !inputs.commit_id }}
+        id: get_commit_id
         run: |
           git fetch origin ${{ inputs.branch_name }}
-          echo "::set-output name=commit_id::$(git rev-parse origin/${{ inputs.branch_name }})"
+          echo "commit_id=$(git rev-parse origin/${{ inputs.branch_name }})" >> $GITHUB_ENV
       
-      - name: Set commit ID
+      - name: Use provided commit ID
         if: ${{ inputs.commit_id }}
-        run: echo "::set-output name=commit_id::${{ inputs.commit_id }}"
+        run: echo "commit_id=${{ inputs.commit_id }}" >> $GITHUB_ENV
       
       - name: Show commit ID
-        run: echo "Commit ID:${{ steps.commit_id.outputs.commit_id }}"
+        run: echo "Commit ID:${{ env.commit_id }}"
       
       - name: Create tag
         id: create_tag
         uses: actions/create-release@v1
         with:
           tag_name: ${{ inputs.tag_name }}
-          commitish: ${{ steps.commit_id.outputs.commit_id }}
-          # release_name: Release ${{ github.sha }}
+          commitish: ${{ env.commit_id }}
           body: |
-            This is an automated release tag created from commit ${{ steps.commit_id.outputs.commit_id }}.
+            This is an automated release tag created from commit ${{ env.commit_id }}.
           draft: false
           prerelease: false
         env:
