@@ -1,4 +1,4 @@
-name: Create Tag
+name: Create Tag Old
 on:
   workflow_dispatch:
     inputs:
