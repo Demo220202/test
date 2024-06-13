@@ -35,7 +35,7 @@ jobs:
       
       - name: Create tag
         id: create_tag
-        uses: actions/create-release@v1
+        uses: actions/create-release@v1.1.4
         with:
           tag_name: ${{ inputs.tag_name }}
           commitish: ${{ env.commit_id }}
@@ -44,4 +44,4 @@ jobs:
           draft: false
           prerelease: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
