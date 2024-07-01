@@ -1,38 +1,50 @@
 name: Tag Old Commit
-
 on:
   workflow_dispatch:
     inputs:
-      commit_id:
-        description: 'Commit ID to tag'
+      branch_name:
+        description: 'Branch name'
         required: true
       tag_name:
         description: 'Tag name'
         required: true
+      commit_id:
+        description: 'Commit ID'
+        required: false
+      pat_token:
+        description: 'Personal Access Token'
+        required: true
 
 jobs:
-  tag-old-commit:
+  create_tag_job:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    - name: Configure Git
-      run: |
-        git config --global user.name "${{ github.actor }}"
-        git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-    
-    - name: Fetch all history
-      run: git fetch --all
-
-    - name: Create tag for old commit
-      run: |
-        git tag -a ${{ github.event.inputs.tag_name }} ${{ github.event.inputs.commit_id }} -m "Tagging old commit"
-    
-    - name: Push tag
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        PERSONAL_ACCESS_TOKEN: ${{ secrets.PAT_TOKEN }}
-      run: |
-        git push https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git ${{ github.event.inputs.tag_name }}
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Get latest commit ID of the specified branch
+        if: ${{ !inputs.commit_id }}
+        id: get_commit_id
+        run: |
+          git fetch origin ${{ inputs.branch_name }}
+          echo "commit_id=$(git rev-parse origin/${{ inputs.branch_name }})" >> $GITHUB_ENV
+      
+      - name: Use provided commit ID
+        if: ${{ inputs.commit_id }}
+        run: echo "commit_id=${{ inputs.commit_id }}" >> $GITHUB_ENV
+      
+      - name: Show commit ID
+        run: echo "Commit ID:${{ env.commit_id }}"
+      
+      - name: Create tag
+        id: create_tag
+        uses: actions/create-release@v1.1.4
+        with:
+          tag_name: ${{ inputs.tag_name }}
+          commitish: ${{ env.commit_id }}
+          body: |
+            This is an automated release tag created from commit ${{ env.commit_id }}.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ inputs.pat_token }}
