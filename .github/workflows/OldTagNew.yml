@@ -1,0 +1,30 @@
+name: Tag Old Commit
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_id:
+        description: 'Commit ID to tag'
+        required: true
+      tag_name:
+        description: 'Tag name'
+        required: true
+
+jobs:
+  tag-old-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Create tag for old commit
+      run: |
+        git config --global user.name "${{ github.actor }}"
+        git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+        git fetch --all
+        git tag -a ${{ github.event.inputs.tag_name }} ${{ github.event.inputs.commit_id }} -m "Tagging old commit"
+        git push origin ${{ github.event.inputs.tag_name }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PERSONAL_ACCESS_TOKEN: ${{ secrets.PAT_TOKEN }}
